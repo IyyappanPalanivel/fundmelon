@@ -4,6 +4,8 @@ import { useContract, useContractRead } from "@thirdweb-dev/react-native";
 import Colors from '../utils/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { ethers } from 'ethers';
+import ProgressBar from '../components/ProgressBar';
+import { DeviceDimen } from '../utils/Dimen';
 
 const CampaignsListScreen = ({ navigation }) => {
 
@@ -37,11 +39,11 @@ const CampaignsListScreen = ({ navigation }) => {
 
     const renderItem = ({ item }) => {
         return (
-            <TouchableOpacity style={styles.campaignsListContainer}>
+            <TouchableOpacity style={styles.campaignsListContainer} onPress={() => navigation.navigate('CampaignDetails', { campaign: item })}>
                 <Image
                     style={styles.campaignImage}
                     source={{
-                        uri: 'https://economictimes.indiatimes.com/thumb/msid-68595193,width-1200,height-900,resizemode-4,imgsize-965088/avengers-endgame.jpg?from=mdr',
+                        uri: item.image,
                     }}
                 />
                 <Text style={[styles.title, { fontSize: 16, marginLeft: 5, marginTop: 10 }]}>{item.name}</Text>
@@ -57,14 +59,12 @@ const CampaignsListScreen = ({ navigation }) => {
         );
     };
 
-    const ProgressBar = ({ progress }) => (
-        <View style={styles.container}>
-            <View style={[styles.progress, { width: `${progress * 100}%` }]} />
-        </View>
-    );
-
     const navigateToCreateCampaign = () => {
         navigation.navigate('CreateCampaign')
+    }
+
+    const navigateViewAll = () => {
+        navigation.navigate('AllCampaigns')
     }
 
     return (
@@ -96,13 +96,16 @@ const CampaignsListScreen = ({ navigation }) => {
                 {/* Trending Campaigns Section */}
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={[styles.title, { fontSize: 18, flex: 1, marginLeft: 20 }]}>Trending Campaigns</Text>
-                    <Text style={[styles.title, { fontSize: 14, color: Colors.primaryColor, marginRight: 20 }]}>View All -{'>'} </Text>
+                    <TouchableOpacity onPress={()=> navigateViewAll()}>
+                        <Text style={[styles.title, { fontSize: 14, color: Colors.primaryColor, marginRight: 20 }]}>View All -{'>'} </Text>
+                    </TouchableOpacity>
                 </View>
 
                 <FlatList
                     data={campaignsList}
                     renderItem={renderItem}
-                    nestedScrollEnabled={false}
+                    nestedScrollEnabled={true}
+                    horizontal={true}
                 />
 
             </ScrollView>
@@ -136,9 +139,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     campaignsListContainer: {
-        width: '70%',
+        width: DeviceDimen.width / 1.5,
         backgroundColor: 'white',
-        marginStart: 20,
+        marginHorizontal: 20,
         marginTop: 12,
         borderRadius: 10,
         paddingBottom: 10

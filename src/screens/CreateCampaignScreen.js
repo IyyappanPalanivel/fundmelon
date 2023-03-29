@@ -5,6 +5,7 @@ import Colors from '../utils/Colors'
 import { ConnectWallet, useContract, useContractWrite, useConnectedWallet } from "@thirdweb-dev/react-native";
 import DatePicker from 'react-native-date-picker';
 import { ethers } from 'ethers';
+import Loader from '../components/Loader';
 
 const CreateCampaignScreen = ({ navigation }) => {
 
@@ -15,12 +16,14 @@ const CreateCampaignScreen = ({ navigation }) => {
     const [creatorAccount, setCreatorAccount] = useState('');
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [image, setImage] = useState('https://economictimes.indiatimes.com/thumb/msid-68595193,width-1200,height-900,resizemode-4,imgsize-965088/avengers-endgame.jpg?from=mdr');
+    const [image, setImage] = useState('https://geekawhat.com/wp-content/uploads/2022/05/3070-High-End-Build-Feature-Image.jpg');
     const [targetAmount, setTargetAmount] = useState('');
     const [deadline, setDeadline] = useState('');
 
     const [date, setDate] = useState(new Date())
     const [open, setOpen] = useState(false)
+
+    const [loading, setLoading] = useState(false);
 
     const submit = async () => {
 
@@ -31,12 +34,16 @@ const CreateCampaignScreen = ({ navigation }) => {
             Alert.alert('Please Connect To Wallet');
         }
         else {
-            console.log('submit', [creatorAccount, name, description, image, ethers.utils.parseUnits(targetAmount.toString(),18), deadline]);
+            console.log('submit', [creatorAccount, name, description, image, ethers.utils.parseUnits(targetAmount.toString(), 18), deadline]);
 
             try {
-                const data = await createCampaign([creatorAccount, name, description, image, ethers.utils.parseUnits(targetAmount.toString(),18) , deadline]);
+                setLoading(true);
+                const data = await createCampaign([creatorAccount, name, description, image, ethers.utils.parseUnits(targetAmount.toString(), 18), deadline]);
+                setLoading(false);
                 console.info("contract call successs", data);
+                Alert.alert('Campaigns Created Successfully in Blockchain')
             } catch (err) {
+                setLoading(false);
                 console.error("contract call failure", err);
             }
         }
@@ -51,6 +58,7 @@ const CreateCampaignScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <Loader loading={loading} />
             <ScrollView>
 
                 {/* Toolbar */}
@@ -102,7 +110,7 @@ const CreateCampaignScreen = ({ navigation }) => {
 
                 {/* Date Picker */}
                 <TouchableOpacity style={styles.inputBox} onPress={() => setOpen(true)} >
-                    <Text style={{color:'black'}}> {date.toLocaleString()}</Text>
+                    <Text style={{ color: 'black' }}> {date.toLocaleString()}</Text>
                 </TouchableOpacity>
                 <DatePicker
                     modal
